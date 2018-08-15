@@ -7,7 +7,27 @@
   <script src="{% static 'app/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'app/js/userScripts.js' %}"></script>
 </head>
+
 <body>
-<p id = "result">  </p>
+<p id = "result">
+</p>
+
+<script>
+
+function sample(i)
+{alert(i);}
+//console.log(j)
+$(document).ready(function(){
+function sample(){
+$(".remove").on('click', function(event){
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+		alert("called");
+		//(... rest of your JS code)
+	});
+	}
+	});
+	
+</script>
 </body>
 </html>
