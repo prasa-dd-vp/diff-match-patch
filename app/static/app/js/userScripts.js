@@ -1,3 +1,27 @@
+var len = 0;
+function remove(i,j)
+{
+	
+console.log(i);
+console.log(j);
+var ifrm = parent.document.getElementById('doc1');
+var doc = ifrm.contentDocument? ifrm.contentDocument: ifrm.contentWindow.document;
+var str = doc.getElementById("target1").innerHTML;
+	
+
+doc.getElementById("target1").innerHTML = str.slice(0,i-len)+str.slice(j-len);
+//console.log(str.slice(0,len-i)+str.slice(len-j));
+document.getElementById("But"+i+"").style.visibility = "hidden";
+
+len = len+(j-i);
+
+/*//console.log(doc.getElementById('target1'));
+var str = doc.getElementById("target1").innerHTML;
+doc.getElementById("target1").innerHTML=" ";
+console.log(str.slice(0,i)+str.slice(j));
+doc.getElementById("target1").innerHTML = str;*/
+}
+
 $(document).ready(function(){
 	var para1, para2;
 	var diffs_array = []
@@ -59,26 +83,28 @@ $(document).ready(function(){
 		//alert(`asdasd`);
 		var json = JSON.parse(data);
 		diffs_array = json['diffs'];
-		var i=0,j,k;
-		var string = '';
+		
+		var removed_string = '';
+		var added_string = '';
 		$.each(diffs_array, function(index, array) { // This each iterates over the arrays.
 			
 			if (array[0] == 0){
 			html_string += array[1]+"<br>";
-			string += array[1]
+			removed_string += array[1]
 			}
 			
 			if (array[0] == -1){
-				i+=1;
-			html_string += "<strike>"+array[1]+`</strike><br><button class="remove"  id="But" onclick = "sample(`+string.length+`)"> Accept</button><br>`;
-			string += array[1]
+				//i+=1;
+			html_string += "<strike>"+array[1]+`</strike><br><button class="remove"  id="But`+removed_string.length+`" onclick = "remove(`+parseInt(removed_string.length)+','+(parseInt(array[1].length)+parseInt(removed_string.length))+`)"> Accept</button><br>`;
+			removed_string += array[1];
 			}
 			
 			if (array[0] == 1){
-			html_string += "<u>"+array[1]+"</u><br>";
+			html_string += "<u>"+array[1]+`</u><br>`;
+			added_string += array[1];
 			}
 		});
-		console.log(string)
+		//console.log(string)
 		$('#resultant').contents().find('#result').html(html_string);
 	}
 	
