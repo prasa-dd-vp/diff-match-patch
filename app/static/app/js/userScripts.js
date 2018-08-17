@@ -3,20 +3,26 @@ var added_string = '';
 var html_string = '';
 var para1, para2;
 var diffs_array = [];
+glo = [];
 
-
-function remove(start,end,pos){
+function remove(json){
 	//console.log(i);
 	//console.log(j);
-	console.log(pos);
-	console.log(diffs_array);
+	//console.log(pos);
+	console.log(json.array);
+	start = json.start;
+	end = json.end;
+	pos = json.pos;
+	array = json.array;
 	var ifrm = parent.document.getElementById('doc1');
 	var doc = ifrm.contentDocument? ifrm.contentDocument: ifrm.contentWindow.document;
 	var get_str = doc.getElementById("target1").innerHTML;
 	var set_str = get_str.slice(0,start)+get_str.slice(end)	
-	removed_string = set_str;
+	//removed_string = set_str;
 	doc.getElementById("target1").innerHTML = set_str;
 	document.getElementById("But"+start+"").style.visibility = "hidden";
+	arr = array.splice(pos,1);
+	console.log("del: "+arr)
 }
 
 function add(i,strr){
@@ -76,8 +82,9 @@ $(document).ready(function(){
 			dataType:'json',
 			success: function (data) {
 					var json = JSON.parse(data);
-					diffs_array = json['diffs'];
-					process(diffs_array);
+					diffs = json['diffs'];
+					glo.push(diffs);
+					process(diffs);
 					}
 		});
     });
@@ -85,9 +92,11 @@ $(document).ready(function(){
 	
 	var array_pos = -1;
 	
-	function process(diffs_array){
-		console.log(diffs_array);
-		 
+	function process(diffs){
+		
+		diffs_array = diffs;
+		
+//console.log(diffs_array);
 		$.each(diffs_array, function(index, array) { // This each iterates over the arrays.
 			array_pos += 1;
 			if (array[0] == 0){
@@ -99,17 +108,25 @@ $(document).ready(function(){
 			if (array[0] == -1){
 				start_index = parseInt(removed_string.length);
 				end_index = (parseInt(array[1].length)+parseInt(removed_string.length));
-				html_string += "<strike>"+array[1]+`</strike><br><button class="remove"  id="But`+removed_string.length+`" onclick = "remove(`+start_index+`,`+end_index+`,`+array_pos+`)"> Accept</button><br>`;
+				var jsonobj = {
+					"start" : start_index,
+					"end" : end_index,
+					"pos" : array_pos,
+					"array" : diffs_array
+				};
+				var rem= "remove("+JSON.stringify(jsonobj)+");";
+				html_string += '<strike>'+array[1]+`</strike><br><button class="remove"  id="But`+removed_string.length+`" onclick = '`+rem+`'> Accept</button><br>`;
+				//console.log(diffs_array);
 				removed_string += array[1];
 			}
 			
 			if (array[0] == 1){
-			var ar = array[1];
-			html_string += "<u>"+array[1]+`</u><br><button class="add"  id="add`+added_string.length+`" onclick = "add(`+parseInt(added_string.length)+`,'`+ar+`')">Accept</button><br>`;
-			added_string += array[1];
+				var ar = array[1];
+				html_string += "<u>"+array[1]+`</u><br><button class="add"  id="add`+added_string.length+`" onclick = "add(`+parseInt(added_string.length)+`,'`+ar+`')">Accept</button><br>`;
+				added_string += array[1];
 			}
 		});
-		
+		console.log("html is:"+html_string);
 		$('#resultant').contents().find('#result').html(html_string);
 	}
 	
